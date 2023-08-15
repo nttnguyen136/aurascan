@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CodeTransaction } from '../../../../core/constants/transaction.enum';
 import { CommonService } from 'src/app/core/services/common.service';
+import { TabsAccount } from 'src/app/core/constants/account.enum';
 
 export interface CardMobSimpleValidatorAddress {
   imgUrl: string;
@@ -28,12 +29,12 @@ export interface CardMobSimpleContent {
 
 export interface CardMobSimpleToken {
   logo: string;
-  name: string
+  name: string;
   class?: string;
   info?: any;
 }
 
-export interface CardMobSimpleAmount{
+export interface CardMobSimpleAmount {
   amount: string;
   decimal: number;
   isAura: boolean;
@@ -51,14 +52,25 @@ export class CardMobAccountComponent implements OnInit {
   @Input() content: CardMobSimpleContent[];
   @Input() tokenData: CardMobSimpleToken;
   @Input() tokenAmount: CardMobSimpleAmount;
-  @Input() data: any;
+  @Input() dataCard: any;
+  @Input() modeQuery: string;
 
+  tabsData = TabsAccount;
   statusTransaction = CodeTransaction;
 
   constructor(public commonService: CommonService) {}
 
   ngOnInit(): void {
-    console.log(this.data);
-    
+    if (this.modeQuery !== this.tabsData.ExecutedTxs) {
+      this.content[this.content.length - 1].label = 'Expand';
+    }
+  }
+
+  expandData(data) {
+    if (data.arrEvent?.length <= 1) {
+      return;
+    }
+
+    data.expand = true;
   }
 }

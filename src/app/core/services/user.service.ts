@@ -45,6 +45,25 @@ export class UserService extends CommonService {
     return this.http.post<any>(`${this.apiUrl}/auth/refresh-token`, payload);
   }
 
+  getListTypeFilter() {
+    const operationsDoc = `
+    query GetListType {
+      ${this.envDB} {
+        transaction_message(distinct_on: type) {
+          type
+        }
+      }
+    }
+    `;
+    return this.http
+      .post<any>(this.graphUrl, {
+        query: operationsDoc,
+        variables: {},
+        operationName: 'GetListType',
+      })
+      .pipe(map((res) => (res?.data ? res?.data[this.envDB] : null)));
+  }
+
   getListTxByAddress(payload) {
     const operationsDoc = `
     query QueryTxOfAccount(
@@ -57,7 +76,6 @@ export class UserService extends CommonService {
       $heightGT: Int = null,
       $heightLT: Int = null,
       $orderHeight: order_by = desc
-    
     ) {
       ${this.envDB} {
         transaction(
@@ -79,6 +97,7 @@ export class UserService extends CommonService {
           code
           transaction_messages {
             type
+            content
           }
         }
       }
@@ -92,22 +111,70 @@ export class UserService extends CommonService {
           compositeKey: payload.compositeKey,
           address: payload.address,
           heightLT: payload.heightLT,
-          listTxMsgType: payload.listTxMsgType
+          listTxMsgType: payload.listTxMsgType,
+          startTime: payload.startTime,
+          endTime: payload.endTime,
         },
         operationName: 'QueryTxOfAccount',
       })
       .pipe(map((res) => (res?.data ? res?.data[this.envDB] : null)));
   }
 
+  getListTxAuraByAddress(payload) {
+    const operationsDoc = `
+    query QueryTxEventsOfAccount($compositeKey: String = null, $address: String = null, $startTime: timestamptz = null, $endTime: timestamptz = null, $limit: Int = null, $listTxMsgType: [String!] = null, $heightGT: Int = null, $heightLT: Int = null, $orderHeight: order_by = desc) {
+      ${this.envDB} {
+        transaction(where: {event_attribute_index: {composite_key: {_eq: $compositeKey}, value: {_eq: $address}}, timestamp: {_lte: $endTime, _gte: $startTime}, transaction_messages: {type: {_in: $listTxMsgType}}, _and: [{height: {_gt: $heightGT, _lt: $heightLT}}]}, limit: $limit, order_by: {height: $orderHeight}) {
+          hash
+          height
+          fee
+          timestamp
+          code
+          transaction_messages {
+            type
+          }
+          events(where: {type: {_eq: "transfer"}, event_attributes: {composite_key: {_eq: $compositeKey}, value: {_eq: $address}}}) {
+            event_attributes {
+              key
+              value
+            }
+          }
+        }
+      }
+    }
+    
+    `;
+    return this.http
+      .post<any>(this.graphUrl, {
+        query: operationsDoc,
+        variables: {
+          limit: payload.limit || 100,
+          compositeKey: payload.compositeKey,
+          address: payload.address,
+          heightLT: payload.heightLT,
+          listTxMsgType: payload.listTxMsgType,
+          startTime: payload.startTime,
+          endTime: payload.endTime,
+        },
+        operationName: 'QueryTxEventsOfAccount',
+      })
+      .pipe(map((res) => (res?.data ? res?.data[this.envDB] : null)));
+  }
+
   getListFTByAddress(payload) {
     const operationsDoc = `
-    query Cw20TXOfAccount($receiver: String = null, $sender: String = null, $startTime: timestamptz = null, $endTime: timestamptz = null, $listAction: [String!] = null) {
+    query Cw20TXOfAccount($receiver: String = null, $sender: String = null, $startTime: timestamptz = null, $endTime: timestamptz = null, $listTxMsgType: [String!] = null, $heightGT: Int = null, $heightLT: Int = null, $limit: Int = null) {
       ${this.envDB} {
-        transaction(where: {events: {smart_contract_events: {cw20_activities: {to: {_eq: $receiver}, _or: [{from: {_eq: $sender}}, {sender: {_eq: $sender}}], action: {_in: $listAction}}}}, timestamp: {_gte: $startTime, _lte: $endTime}}, order_by: {height: desc}) {
+        transaction(where: {events: {smart_contract_events: {cw20_activities: {to: {_eq: $receiver}, from: {_eq: $sender}}}}, timestamp: {_gte: $startTime, _lte: $endTime}, _and: {height: {_gt: $heightGT, _lt: $heightLT}}, transaction_messages: {type: {_in: $listTxMsgType}}}, order_by: {height: desc}, limit: $limit) {
           gas_used
           hash
           height
           timestamp
+          code
+          transaction_messages {
+            content
+            type
+          }
           events(where: {smart_contract_events: {cw20_activities: {id: {_is_null: false}}}}) {
             smart_contract_events {
               cw20_activities {
@@ -133,23 +200,42 @@ export class UserService extends CommonService {
       .post<any>(this.graphUrl, {
         query: operationsDoc,
         variables: {
-          sender: 'aura1uh24g2lc8hvvkaaf7awz25lrh5fptthu2dhq0n',
-          receiver: 'aura1uh24g2lc8hvvkaaf7awz25lrh5fptthu2dhq0n',
-          listAction: ['transfer'],
-          startTime: '2023-01-13T11:11:46.644+07:00',
-          endTime: '2023-01-13T11:11:46.644+07:00',
+          sender: payload.sender,
+          receiver: payload.receiver,
+          listTxMsgType: payload.listTxMsgType,
+          startTime: payload.startTime,
+          endTime: payload.endTime,
         },
         operationName: 'Cw20TXOfAccount',
       })
       .pipe(map((res) => (res?.data ? res?.data[this.envDB] : null)));
   }
 
-  getListTypeFilter() {
+  getListNFTByAddress(payload) {
     const operationsDoc = `
-    query GetListType {
+    query Cw721TXOfAccount($receiver: String = null, $sender: String = null, $startTime: timestamptz = null, $endTime: timestamptz = null, $listTxMsgType: [String!] = null, $heightGT: Int = null, $heightLT: Int = null, $limit: Int = null) {
       ${this.envDB} {
-        transaction_message(distinct_on: type) {
-          type
+        transaction(where: {events: {smart_contract_events: {cw721_activity: {to: {_eq: $receiver}, from: {_eq: $sender}}}}, timestamp: {_gte: $startTime, _lte: $endTime}, _and: {height: {_gt: $heightGT, _lt: $heightLT}}, transaction_messages: {type: {_in: $listTxMsgType}}}, order_by: {height: desc}, limit: $limit) {
+          gas_used
+          hash
+          height
+          timestamp
+          code
+          transaction_messages {
+            content
+            type
+          }
+          events(where: {smart_contract_events: {cw721_activity: {id: {_is_null: false}}}}) {
+            smart_contract_events {
+              cw721_activity {
+                action
+                from
+                to
+                sender
+                cw721_token_id
+              }
+            }
+          }
         }
       }
     }
@@ -157,8 +243,14 @@ export class UserService extends CommonService {
     return this.http
       .post<any>(this.graphUrl, {
         query: operationsDoc,
-        variables: {},
-        operationName: 'GetListType',
+        variables: {
+          sender: payload.sender,
+          receiver: payload.receiver,
+          listTxMsgType: payload.listTxMsgType,
+          startTime: payload.startTime,
+          endTime: payload.endTime,
+        },
+        operationName: 'Cw721TXOfAccount',
       })
       .pipe(map((res) => (res?.data ? res?.data[this.envDB] : null)));
   }

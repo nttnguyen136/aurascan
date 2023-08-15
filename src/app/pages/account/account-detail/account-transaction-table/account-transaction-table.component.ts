@@ -1,11 +1,12 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { DatePipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { TabsAccount } from 'src/app/core/constants/account.enum';
-import { PAGE_EVENT } from 'src/app/core/constants/common.constant';
+import { DATEFORMAT, PAGE_EVENT } from 'src/app/core/constants/common.constant';
 import { MAX_LENGTH_SEARCH_TOKEN } from 'src/app/core/constants/token.constant';
 import { TYPE_TRANSACTION } from 'src/app/core/constants/transaction.constant';
 import { EnvironmentService } from 'src/app/core/data-services/environment.service';
@@ -32,22 +33,22 @@ export class AccountTransactionTableComponent {
   templates: Array<TableTemplate>;
 
   templatesExecute: Array<TableTemplate> = [
-    { matColumnDef: 'tx_hash', headerCellDef: 'Tx Hash' },
-    { matColumnDef: 'type', headerCellDef: 'Type' },
-    { matColumnDef: 'status', headerCellDef: 'Result' },
-    { matColumnDef: 'timestamp', headerCellDef: 'Time' },
-    { matColumnDef: 'fee', headerCellDef: 'Fee' },
-    { matColumnDef: 'height', headerCellDef: 'Height' },
+    { matColumnDef: 'tx_hash', headerCellDef: 'Tx Hash', headerWidth: 18},
+    { matColumnDef: 'type', headerCellDef: 'Type', headerWidth: 20},
+    { matColumnDef: 'status', headerCellDef: 'Result', headerWidth: 12},
+    { matColumnDef: 'timestamp', headerCellDef: 'Time', headerWidth: 15},
+    { matColumnDef: 'fee', headerCellDef: 'Fee', headerWidth: 20},
+    { matColumnDef: 'height', headerCellDef: 'Height', headerWidth: 12},
   ];
 
-  templatesFT: Array<TableTemplate> = [
-    { matColumnDef: 'tx_hash', headerCellDef: 'Tx Hash' },
-    { matColumnDef: 'type', headerCellDef: 'Type' },
-    { matColumnDef: 'status', headerCellDef: 'Result' },
-    { matColumnDef: 'timestamp', headerCellDef: 'Time' },
-    { matColumnDef: 'fromAddress', headerCellDef: 'From' },
-    { matColumnDef: 'toAddress', headerCellDef: 'To' },
-    { matColumnDef: 'amount', headerCellDef: 'Amount' },
+  templatesToken: Array<TableTemplate> = [
+    { matColumnDef: 'expand', headerCellDef: '', headerWidth: 4 },
+    { matColumnDef: 'tx_hash', headerCellDef: 'Tx Hash', headerWidth: 12 },
+    { matColumnDef: 'type', headerCellDef: 'Type', headerWidth: 15 },
+    { matColumnDef: 'status', headerCellDef: 'Result', headerWidth: 8 },
+    { matColumnDef: 'timestamp', headerCellDef: 'Time', headerWidth: 12 },
+    { matColumnDef: 'fromAddress', headerCellDef: 'From', headerWidth: 14 },
+    { matColumnDef: 'toAddress', headerCellDef: 'To', headerWidth: 14 },
   ];
 
   displayedColumns: string[];
@@ -73,13 +74,14 @@ export class AccountTransactionTableComponent {
   listTypeSelected = '';
   isSent = true;
   isSearch = false;
+  minDate;
+  maxDate;
+  linkToken = 'token-nft';
 
   breakpoint$ = this.layout.observe([Breakpoints.Small, Breakpoints.XSmall]);
   denom = this.environmentService.configValue.chain_info.currencies[0].coinDenom;
   coinMiniDenom = this.environmentService.configValue.chain_info.currencies[0].coinMinimalDenom;
   coinInfo = this.environmentService.configValue.chain_info.currencies[0];
-  image_s3 = this.environmentService.configValue.image_s3;
-  defaultLogoAura = this.image_s3 + 'images/icons/aura.svg';
 
   constructor(
     public global: Globals,
@@ -88,11 +90,17 @@ export class AccountTransactionTableComponent {
     public commonService: CommonService,
     private userService: UserService,
     private route: ActivatedRoute,
-  ) {}
+    private datePipe: DatePipe,
+  ) {
+    this.minDate = new Date(2023, 2, 20);
+    this.maxDate = new Date().toISOString().slice(0, 10);
+  }
 
   ngOnInit(): void {
     this.initTnxFilter();
-    this.getListTypeFilter();
+    if (this.tnxTypeOrigin?.length === 0) {
+      this.getListTypeFilter();
+    }
     this.route.params.subscribe((params) => {
       if (params?.address) {
         this.currentAddress = params?.address;
@@ -118,6 +126,7 @@ export class AccountTransactionTableComponent {
     if (event.target.checked) {
       if (type === 'all') {
         this.transactionFilter.type = null;
+        this.listTypeSelected = 'All';
       } else {
         this.transactionFilter.type.push(type.label);
         if (!this.listTypeSelected) {
@@ -130,6 +139,7 @@ export class AccountTransactionTableComponent {
       this.listTypeSelected = this.listTypeSelected?.replace(', ' + type?.value, '').replace(type?.value, '');
       if (type === 'all') {
         this.transactionFilter.type = [];
+        this.listTypeSelected = '';
       } else {
         this.transactionFilter.type.forEach((element, index) => {
           if (element === type.label) {
@@ -161,14 +171,32 @@ export class AccountTransactionTableComponent {
     this.getTxsAddress();
   }
 
+  changeType(isSent = true) {
+    this.isSent = isSent;
+    this.searchType();
+  }
+
+  getConvertDate(date, lastDate = false) {
+    if (!date) {
+      return null;
+    }
+
+    let temp = this.datePipe.transform(date, DATEFORMAT.DATE_ONLY);
+    let subStringDate = lastDate ? 'T24:00:000Z' : 'T00:00:000Z';
+    return temp + subStringDate;
+  }
+
   getTxsAddress(nextKey = null): void {
     const address = this.currentAddress;
+
     let payload = {
       limit: 100,
       address: address,
       heightLT: nextKey,
       compositeKey: null,
       listTxMsgType: null,
+      startTime: this.getConvertDate(this.transactionFilter.startDate) || null,
+      endTime: this.getConvertDate(this.transactionFilter.endDate, true) || null,
     };
 
     if (this.transactionFilter?.type?.length > 0) {
@@ -183,18 +211,36 @@ export class AccountTransactionTableComponent {
         this.getListTxByAddress(payload);
         break;
       case TabsAccount.AuraTxs:
-        payload.compositeKey = 'coin_spent.spender';
+        payload.compositeKey = 'transfer.sender';
         if (!this.isSent) {
-          payload.compositeKey = 'coin_received.receiver';
+          payload.compositeKey = 'transfer.recipient';
         }
-        this.templates = this.templatesExecute;
-        this.displayedColumns = this.templatesExecute.map((dta) => dta.matColumnDef);
-        this.getListTxByAddress(payload);
+        this.templates = [...this.templatesToken];
+        this.templates.push({ matColumnDef: 'amount', headerCellDef: 'Amount', headerWidth: 15 });
+        this.displayedColumns = this.templates.map((dta) => dta.matColumnDef);
+        this.getListTxAuraByAddress(payload);
         break;
       case TabsAccount.FtsTxs:
-        this.templates = this.templatesExecute;
-        this.displayedColumns = this.templatesFT.map((dta) => dta.matColumnDef);
+        if (this.isSent) {
+          payload['sender'] = address;
+        } else {
+          payload['receiver'] = address;
+        }
+        this.templates = [...this.templatesToken];
+        this.templates.push({ matColumnDef: 'amount', headerCellDef: 'Amount', headerWidth: 17 });
+        this.displayedColumns = this.templates.map((dta) => dta.matColumnDef);
         this.getListFTByAddress(payload);
+        break;
+      case TabsAccount.NftTxs:
+        if (this.isSent) {
+          payload['sender'] = address;
+        } else {
+          payload['receiver'] = address;
+        }
+        this.templates = [...this.templatesToken];
+        this.templates.push({ matColumnDef: 'tokenId', headerCellDef: 'Token ID', headerWidth: 15 });
+        this.displayedColumns = this.templates.map((dta) => dta.matColumnDef);
+        this.getListNFTByAddress(payload);
         break;
       default:
         break;
@@ -216,31 +262,21 @@ export class AccountTransactionTableComponent {
   getListTxByAddress(payload) {
     this.userService.getListTxByAddress(payload).subscribe({
       next: (data) => {
-        if (data?.transaction?.length > 0) {
-          if (data?.transaction?.length >= 100) {
-            this.nextKey = data?.transaction[data?.transaction?.length - 1]?.height;
-          }
+        this.handleGetData(data);
+      },
+      error: () => {
+        this.transactionLoading = false;
+      },
+      complete: () => {
+        this.transactionLoading = false;
+      },
+    });
+  }
 
-          let setReceive = false;
-          if (this.modeQuery !== TabsAccount.ExecutedTxs && !this.isSent) {
-            setReceive = true;
-          }
-
-          let txs = convertDataAccountTransaction(data, this.coinInfo, setReceive);
-
-          if (this.dataSource.data.length > 0) {
-            this.dataSource.data = [...this.dataSource.data, ...txs];
-          } else {
-            this.dataSource.data = [...txs];
-          }
-
-          this.dataSourceMobile = this.dataSource.data.slice(
-            this.pageData.pageIndex * this.pageData.pageSize,
-            this.pageData.pageIndex * this.pageData.pageSize + this.pageData.pageSize,
-          );
-
-          this.pageData.length = this.dataSource.data.length;
-        }
+  getListTxAuraByAddress(payload) {
+    this.userService.getListTxAuraByAddress(payload).subscribe({
+      next: (data) => {
+        this.handleGetData(data);
       },
       error: () => {
         this.transactionLoading = false;
@@ -254,35 +290,7 @@ export class AccountTransactionTableComponent {
   getListFTByAddress(payload) {
     this.userService.getListFTByAddress(payload).subscribe({
       next: (data) => {
-        // if (data?.transaction?.length > 0) {
-        //   this.nextKey = data?.transaction[data?.transaction?.length - 1]?.height;
-        //   if (data?.transaction?.length >= 100) {
-        //     this.hasNextKey.emit(true);
-        //   } else {
-        //     this.hasNextKey.emit(false);
-        //   }
-
-        //   let setReceive = false;
-        //   if (this.modeQuery !== TabsAccount.ExecutedTxs && !this.isTypeSend) {
-        //     setReceive = true;
-        //   }
-
-        //   let txs = convertDataAccountTransaction(data, this.coinInfo, setReceive);
-
-        //   if (this.dataSource.data.length > 0) {
-        //     this.dataSource.data = [...this.dataSource.data, ...txs];
-        //   } else {
-        //     this.dataSource.data = [...txs];
-        //   }
-
-        //   this.dataSourceMobile = this.dataSource.data.slice(
-        //     this.pageData.pageIndex * this.pageData.pageSize,
-        //     this.pageData.pageIndex * this.pageData.pageSize + this.pageData.pageSize,
-        //   );
-
-        //   this.pageData.length = this.dataSource.data.length;
-        //   this.lengthData.emit(this.pageData.length);
-        // }
+        this.handleGetData(data);
       },
       error: () => {
         this.transactionLoading = false;
@@ -291,6 +299,55 @@ export class AccountTransactionTableComponent {
         this.transactionLoading = false;
       },
     });
+  }
+
+  getListNFTByAddress(payload) {
+    this.userService.getListNFTByAddress(payload).subscribe({
+      next: (data) => {
+        this.handleGetData(data);
+      },
+      error: () => {
+        this.transactionLoading = false;
+      },
+      complete: () => {
+        this.transactionLoading = false;
+      },
+    });
+  }
+
+  handleGetData(data) {
+    if (data?.transaction?.length > 0) {
+      if (data?.transaction?.length >= 100) {
+        this.nextKey = data?.transaction[data?.transaction?.length - 1]?.height;
+      }
+
+      let setReceive = false;
+      if (this.modeQuery !== TabsAccount.ExecutedTxs && !this.isSent) {
+        setReceive = true;
+      }
+
+      let txs = convertDataAccountTransaction(data, this.coinInfo, this.modeQuery, setReceive);
+      if (this.dataSource.data.length > 0) {
+        this.dataSource.data = [...this.dataSource.data, ...txs];
+      } else {
+        this.dataSource.data = [...txs];
+      }
+
+      this.dataSourceMobile = this.dataSource.data.slice(
+        this.pageData.pageIndex * this.pageData.pageSize,
+        this.pageData.pageIndex * this.pageData.pageSize + this.pageData.pageSize,
+      );
+
+      this.pageData.length = this.dataSource.data.length;
+    }
+  }
+
+  expandData(data) {
+    if (data.arrEvent?.length <= 1) {
+      return;
+    }
+
+    data.expand = true;
   }
 
   paginatorEmit(e: MatPaginator): void {

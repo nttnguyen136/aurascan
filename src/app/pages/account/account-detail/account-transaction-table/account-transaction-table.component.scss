@@ -174,3 +174,14 @@
   text-overflow: ellipsis;
   max-width: 90%;
 }
+
+.icon-expand {
+  &.active {
+    cursor: pointer;
+    color: var(--aura-white) !important;
+  }
+}
+
+.row-tx:has(.ph-caret-up) {
+  background: linear-gradient(0deg, #262838, #262838), linear-gradient(0deg, #0e7e6b, #0e7e6b);
+}

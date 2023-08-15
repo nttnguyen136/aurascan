@@ -33,6 +33,7 @@ import { AccountTransactionTableComponent } from './account-transaction-table/ac
 import { UserService } from 'src/app/core/services/user.service';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -68,6 +69,7 @@ import { MatNativeDateModule } from '@angular/material/core';
     NameTagModule,
     TooltipCustomizeModule,
     ClipboardModule,
+    RouterModule
   ],
   providers: [TransactionService, AccountService, DecimalPipe, UserService],
 })

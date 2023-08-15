@@ -1,17 +1,17 @@
-<div class="d-flex justify-content-between mb-3 align-items-center">
-  <div>
-    <div class="button-switch-stage button-switch-stage__1" *ngIf="displayType">
-      <button type="button" [class.active]="isSent" class="w-auto px-4 py-2">
+<div class="d-flex justify-content-between align-items-center" [ngClass]="displayType ? 'mb-3' : 'mb-6'">
+  <div *ngIf="displayType">
+    <div class="button-switch-stage button-switch-stage__1">
+      <button type="button" [class.active]="isSent" (click)="changeType(true)" class="w-auto px-4 py-2">
         <span>Sent</span>
       </button>
-      <button type="button" [class.active]="!isSent" class="w-auto px-4 py-2">
+      <button type="button" [class.active]="!isSent" (click)="changeType(false)" class="w-auto px-4 py-2">
         <span>Received</span>
       </button>
     </div>
-    <div *ngIf="!displayType && !transactionLoading">
-      {{ nextKey ? 'More than' : 'A total of' }} {{ pageData?.length }} transaction{{ pageData?.length > 1 ? 's' : '' }}
-      found
-    </div>
+  </div>
+  <div *ngIf="!transactionLoading && !displayType">
+    {{ nextKey ? 'More than' : 'A total of' }} {{ pageData?.length }} transaction{{ pageData?.length > 1 ? 's' : '' }}
+    found
   </div>
   <div>
     <button
@@ -32,7 +32,7 @@
         <div class="cursor-pointer d-flex flex-column p-0 mb-4">
           <span class="text-sm mb-2">From - To</span>
           <div class="input-group align-items-center d-flex justify-content-between pr-1">
-            <mat-date-range-input [rangePicker]="picker">
+            <mat-date-range-input [rangePicker]="picker" [min]="minDate" [max]="maxDate">
               <input matStartDate placeholder="Start date" [(ngModel)]="transactionFilter.startDate" />
               <input matEndDate placeholder="End date" [(ngModel)]="transactionFilter.endDate" class="pl-3" />
             </mat-date-range-input>
@@ -49,7 +49,7 @@
             type="button">
             <span class="box-type-selected">
               <ng-container *ngIf="listTypeSelected?.length === 0"> Select a type </ng-container>
-              <ng-container *ngIf="listTypeSelected">{{ listTypeSelected }} </ng-container>
+              <span *ngIf="listTypeSelected" class="text--white">{{ listTypeSelected }} </span>
             </span>
             <i class="ph-light ph-funnel-simple text--white h1"></i>
           </button>
@@ -129,13 +129,13 @@
         <!-- Button action group -->
         <div class="divider divider-horizontal"></div>
         <div class="d-flex justify-content-between align-items-center pt-4">
-          <button class="button button-pill button-outline button--xlg" (click)="initTnxFilter()">
+          <button class="button button-pill button-outline button--xlg" (click)="initTnxFilter(); searchType()">
             <span>Reset</span>
           </button>
           <div class="d-flex">
             <button
               class="button button-pill button-outline button--xlg ml-2 ml-lg-0"
-              (click)="menuTrigger.closeMenu(); searchType()">
+              (click)="menuTrigger.closeMenu()">
               <span>Cancel</span>
             </button>
             <button
@@ -150,6 +150,10 @@
     </mat-menu>
   </div>
 </div>
+<div *ngIf="!transactionLoading && displayType" class="mb-3">
+  {{ nextKey ? 'More than' : 'A total of' }} {{ pageData?.length }} transaction{{ pageData?.length > 1 ? 's' : '' }}
+  found
+</div>
 
 <ngx-simplebar *ngIf="dataSource && dataSource.data">
   <ng-container *ngIf="dataSource.data.length > 0; else noValues">
@@ -157,16 +161,7 @@
       <table mat-table [dataSource]="dataSource" class="aura-table account-transaction-table">
         <ng-container *ngFor="let template of templates; index as i">
           <ng-container [matColumnDef]="template.matColumnDef">
-            <th
-              mat-header-cell
-              *matHeaderCellDef
-              class="{{
-                template.headerCellDef === 'Time' ||
-                template.headerCellDef === 'Type' ||
-                template.headerCellDef === 'Tx Hash'
-                  ? 'col-per-15'
-                  : 'col-per-13'
-              }}">
+            <th mat-header-cell *matHeaderCellDef [style.width.%]="template?.headerWidth">
               <div [innerHTML]="template.headerCellDef | translate"></div>
             </th>
 
@@ -188,10 +183,22 @@
                     [routerLink]="['/blocks', data['height']]">
                     {{ data[template.matColumnDef] }}
                   </a>
+                  <div *ngSwitchCase="'expand'">
+                    <i
+                      *ngIf="!data.expand"
+                      class="ph ph-caret-down text--gray-6 h3 icon-expand"
+                      (click)="expandData(data)"
+                      [ngClass]="data.arrEvent?.length > 1 ? 'active' : ''"></i>
+                    <i
+                      *ngIf="data.expand"
+                      class="ph ph-caret-up text--white h3 cursor-pointer"
+                      (click)="data.expand = false"></i>
+                  </div>
                   <div *ngSwitchCase="'type'">
                     <div class="aura-status aura-tooltip-contain">
-                      <div class="status cursor-pointer aura-tooltip-object">
+                      <div class="status cursor-pointer aura-tooltip-object text-capitalize">
                         {{ data[template.matColumnDef] | stringEllipsis : 20 }}
+                        <div *ngIf="data.arrEvent?.length > 1" class="ml-1 text--gray-5"> +{{ data.arrEvent?.length - 1 }}</div>
                       </div>
                       <app-tooltip-customize [content]="data[template.matColumnDef]"> </app-tooltip-customize>
                     </div>
@@ -213,6 +220,31 @@
                     {{ +data[template.matColumnDef] | mask : 'separator.6' }}
                     <span class="text--primary">{{ denom }}</span>
                   </div>
+                  <div *ngSwitchCase="'amount'">
+                    <span [appBigNumber]="data[template.matColumnDef]" [decimal]="0"></span>
+                    <span class="text--primary"> {{ data.denom || denom }}</span>
+                  </div>
+                  <div *ngSwitchCase="'fromAddress'">
+                    <app-name-tag
+                      [value]="data.fromAddress || currentAddress"
+                      [isLink]="
+                        !(data.fromAddress?.startsWith('0000') || currentAddress?.startsWith('0000'))
+                      "></app-name-tag>
+                  </div>
+                  <div *ngSwitchCase="'toAddress'">
+                    <app-name-tag
+                      [value]="data.toAddress"
+                      [isLink]="!data.toAddress?.startsWith('0000')"></app-name-tag>
+                  </div>
+                  <div *ngSwitchCase="'tokenId'" class="d-flex justify-content-between align-items-center">
+                    <div>{{ data[template.matColumnDef] || '-' | stringEllipsis : 16 }}</div>
+                    <button
+                      class="button button--sm button-outline button-outline__in-card button-pill text--white ml-2"
+                      *ngIf="data[template.matColumnDef]"
+                      [routerLink]="['/tokens/' + linkToken, data.contractAddress, data.tokenId]">
+                      NFT
+                    </button>
+                  </div>
                   <div *ngSwitchDefault>{{ data[template.matColumnDef] }}</div>
                 </ng-container>
               </div>
@@ -221,7 +253,7 @@
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="row-tx"></tr>
         <tr class="mat-row" *matNoDataRow>
           <td class="mat-cell g-no-data pt-8" colspan="9999">
             <app-loading-sprint></app-loading-sprint>
@@ -233,7 +265,8 @@
       <app-card-mob-account
         *ngFor="let data of dataSourceMobile"
         [link]="'/transaction/' + data.tx_hash"
-        [data]="data"
+        [dataCard]="data"
+        [modeQuery]="modeQuery"
         [title]="{
           size: 'md',
           titleClass: 'body-02-mob',
@@ -269,7 +302,9 @@
   </ng-container>
   <ng-template #noValues>
     <app-table-no-data *ngIf="!transactionLoading && !isSearch"></app-table-no-data>
-    <app-table-no-data *ngIf="!transactionLoading && isSearch" textNull="No data with this type of message"></app-table-no-data>
+    <app-table-no-data
+      *ngIf="!transactionLoading && isSearch"
+      textNull="No data with this type of message"></app-table-no-data>
   </ng-template>
 </ngx-simplebar>
 <div *ngIf="transactionLoading" class="">
