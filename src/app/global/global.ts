@@ -291,6 +291,14 @@ export function convertDataTransaction(data, coinInfo) {
       }
     } catch (e) {}
 
+    if (typeOrigin === TRANSACTION_TYPE_ENUM.ExecuteContract) {
+      try {
+        let dataTemp = JSON.parse(messages[0]?.msg);
+        let action = Object.keys(dataTemp)[0];
+        type = 'Execute_' + action[0]?.toUpperCase() + action.substr(1)?.toLowerCase();
+      } catch {}
+    }
+
     const status =
       _.get(element, 'code') == CodeTransaction.Success ? StatusTransaction.Success : StatusTransaction.Fail;
 
@@ -374,62 +382,54 @@ export function convertDataAccountTransaction(data, coinInfo, modeQuery, setRece
     let tokenId;
     let contractAddress;
 
-    if (modeQuery === TabsAccount.FtsTxs) {
-      arrEvent = _.get(element, 'events').map((item, index) => {
-        let type = _.get(element, 'transaction_messages[0].content["@type"]');
-        if (type === TRANSACTION_TYPE_ENUM.ExecuteContract) {
-          let action = _.get(item, 'smart_contract_events[0].cw20_activities[0].action');
-          type = 'Execute_' + action[0]?.toUpperCase() + action.substr(1)?.toLowerCase();
-        } else {
-          type = _.find(TYPE_TRANSACTION, { label: type })?.value;
-        }
+    switch (modeQuery) {
+      case TabsAccount.ExecutedTxs:
+        type = getTypeTx(element);
+        break;
+      case TabsAccount.AuraTxs:
+        arrEvent = _.get(element, 'events').map((item, index) => {
+          let type = _.get(element, 'transaction_messages[0].content["@type"]');
+          let fromAddress = _.get(item, 'event_attributes[1].value');
+          let toAddress = _.get(item, 'event_attributes[0].value');
+          let amountTemp = _.get(item, 'event_attributes[2].value')?.match(/\d+/g)[0];
+          let denom = coinInfo.coinDenom;
+          let amount = balanceOf(Number(amountTemp) || 0, denom);
+          return { type, fromAddress, toAddress, amount, denom };
+        });
+        break;
+      case TabsAccount.FtsTxs:
+        arrEvent = _.get(element, 'events').map((item, index) => {
+          let type = getTypeTx(element);
+          let fromAddress = _.get(item, 'smart_contract_events[0].cw20_activities[0].from');
+          let toAddress = _.get(item, 'smart_contract_events[0].cw20_activities[0].to') || NULL_ADDRESS;
+          let denom = _.get(item, 'smart_contract_events[0].smart_contract.cw20_contract.symbol');
+          let amountTemp = _.get(item, 'smart_contract_events[0].cw20_activities[0].amount');
+          let decimal = _.get(item, 'smart_contract_events[0].smart_contract.cw20_contract.decimal');
+          let amount = balanceOf(amountTemp || 0, +decimal);
+          return { type, fromAddress, toAddress, amount, denom };
+        });
+        break;
+      case TabsAccount.NftTxs:
+        arrEvent = _.get(element, 'events').map((item, index) => {
+          let type = getTypeTx(element);
+          let fromAddress = _.get(item, 'smart_contract_events[0].cw721_activity.sender');
+          let toAddress = _.get(item, 'smart_contract_events[0].cw721_activity.to') || NULL_ADDRESS;
+          let contractAddress = _.get(element, 'transaction_messages[0].content.contract');
+          let dataTemp = _.get(element, 'transaction_messages[0].content.msg');
+          let tokenId;
+          if (typeof dataTemp === 'string') {
+            try {
+              dataTemp = JSON.parse(dataTemp);
+              tokenId = dataTemp[Object.keys(dataTemp)[0]]?.token_id || '';
+            } catch (e) {}
+          }
 
-        let fromAddress = _.get(item, 'smart_contract_events[0].cw20_activities[0].from');
-        let toAddress = _.get(item, 'smart_contract_events[0].cw20_activities[0].to') || NULL_ADDRESS;
-        let denom = _.get(item, 'smart_contract_events[0].smart_contract.cw20_contract.symbol');
-        let amountTemp = _.get(item, 'smart_contract_events[0].cw20_activities[0].amount');
-        let decimal = _.get(item, 'smart_contract_events[0].smart_contract.cw20_contract.decimal');
-        let amount = balanceOf(amountTemp || 0, +decimal);
-        return { type, fromAddress, toAddress, amount, denom };
-      });
-    } else if (modeQuery === TabsAccount.NftTxs) {
-      arrEvent = _.get(element, 'events').map((item, index) => {
-        let type = _.get(element, 'transaction_messages[0].content["@type"]');
-        if (type === TRANSACTION_TYPE_ENUM.ExecuteContract) {
-          let action = _.get(item, 'smart_contract_events[0].cw721_activity.action');
-          type = 'Execute_' + action[0]?.toUpperCase() + action.substr(1)?.toLowerCase();
-        } else {
-          type = _.find(TYPE_TRANSACTION, { label: type })?.value;
-        }
-        let fromAddress = _.get(item, 'smart_contract_events[0].cw721_activity.sender');
-        let toAddress = _.get(item, 'smart_contract_events[0].cw721_activity.to') || NULL_ADDRESS;
-        let contractAddress = _.get(element, 'transaction_messages[0].content.contract');
-        let dataTemp = _.get(element, 'transaction_messages[0].content.msg');
-        let tokenId;
-        if (typeof dataTemp === 'string') {
-          try {
-            dataTemp = JSON.parse(dataTemp);
-            tokenId = dataTemp[Object.keys(dataTemp)[0]]?.token_id || '';
-          } catch (e) {}
-        }
-
-        return { type, fromAddress, toAddress, tokenId, contractAddress };
-      });
-    } else if (modeQuery === TabsAccount.AuraTxs) {
-      arrEvent = _.get(element, 'events').map((item, index) => {
-        let type = _.find(TYPE_TRANSACTION, { label: lstTypeTemp[0]?.type })?.value;
-        let fromAddress = _.get(item, 'event_attributes[1].value');
-        let toAddress = _.get(item, 'event_attributes[0].value');
-        let amountTemp = _.get(item, 'event_attributes[2].value')?.match(/\d+/g)[0];
-        let denom = coinInfo.coinDenom;
-        let amount = balanceOf(Number(amountTemp) || 0, denom);
-        return { type, fromAddress, toAddress, amount, denom };
-      });
+          return { type, fromAddress, toAddress, tokenId, contractAddress };
+        });
+        break;
     }
 
-    if (modeQuery === TabsAccount.ExecutedTxs) {
-      type = _.find(TYPE_TRANSACTION, { label: lstTypeTemp[0]?.type })?.value;
-    } else {
+    if (modeQuery !== TabsAccount.ExecutedTxs) {
       fromAddress = arrEvent[0]?.fromAddress;
       toAddress = arrEvent[0]?.toAddress;
       denom = arrEvent[0]?.denom;
@@ -463,16 +463,17 @@ export function convertDataAccountTransaction(data, coinInfo, modeQuery, setRece
   return txs;
 }
 
-export function getObjectValue(obj, key, result = null): void {
-  if (!obj || typeof obj !== 'object') {
-    result = '';
-  }
-
-  if (obj.hasOwnProperty(key)) {
-    result = obj[key];
+export function getTypeTx(element) {
+  let type = _.get(element, 'transaction_messages[0].content["@type"]');
+  if (type === TRANSACTION_TYPE_ENUM.ExecuteContract) {
+    try {
+      let dataTemp = _.get(element, 'transaction_messages[0].content.msg');
+      dataTemp = JSON.parse(dataTemp);
+      let action = Object.keys(dataTemp)[0];
+      type = 'Execute_' + action[0]?.toUpperCase() + action.substr(1)?.toLowerCase();
+    } catch (e) {}
   } else {
-    for (const k in obj) {
-      getObjectValue(obj[k], key);
-    }
+    type = _.find(TYPE_TRANSACTION, { label: type })?.value || type.split('.').pop();
   }
+  return type;
 }

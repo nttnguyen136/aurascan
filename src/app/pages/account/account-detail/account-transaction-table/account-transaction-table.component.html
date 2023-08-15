@@ -198,9 +198,18 @@
                     <div class="aura-status aura-tooltip-contain">
                       <div class="status cursor-pointer aura-tooltip-object text-capitalize">
                         {{ data[template.matColumnDef] | stringEllipsis : 20 }}
-                        <div *ngIf="data.arrEvent?.length > 1" class="ml-1 text--gray-5"> +{{ data.arrEvent?.length - 1 }}</div>
+                        <div *ngIf="data.arrEvent?.length > 1" class="ml-1 text--gray-5">
+                          +{{ data.arrEvent?.length - 1 }}
+                        </div>
                       </div>
-                      <app-tooltip-customize [content]="data[template.matColumnDef]"> </app-tooltip-customize>
+                      <app-tooltip-customize
+                        [content]="data[template.matColumnDef]"
+                        *ngIf="modeQuery === tabsData.ExecutedTxs">
+                      </app-tooltip-customize>
+                      <app-tooltip-customize
+                        [content]="data.arrEvent | displayTypeToolTip"
+                        *ngIf="modeQuery !== tabsData.ExecutedTxs">
+                      </app-tooltip-customize>
                     </div>
                   </div>
                   <div *ngSwitchCase="'status'">

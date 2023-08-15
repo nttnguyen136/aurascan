@@ -31,14 +31,15 @@ export class AccountTransactionTableComponent {
   textSearch = '';
   searchValue = '';
   templates: Array<TableTemplate>;
+  tabsData = TabsAccount;
 
   templatesExecute: Array<TableTemplate> = [
-    { matColumnDef: 'tx_hash', headerCellDef: 'Tx Hash', headerWidth: 18},
-    { matColumnDef: 'type', headerCellDef: 'Type', headerWidth: 20},
-    { matColumnDef: 'status', headerCellDef: 'Result', headerWidth: 12},
-    { matColumnDef: 'timestamp', headerCellDef: 'Time', headerWidth: 15},
-    { matColumnDef: 'fee', headerCellDef: 'Fee', headerWidth: 20},
-    { matColumnDef: 'height', headerCellDef: 'Height', headerWidth: 12},
+    { matColumnDef: 'tx_hash', headerCellDef: 'Tx Hash', headerWidth: 18 },
+    { matColumnDef: 'type', headerCellDef: 'Type', headerWidth: 20 },
+    { matColumnDef: 'status', headerCellDef: 'Result', headerWidth: 12 },
+    { matColumnDef: 'timestamp', headerCellDef: 'Time', headerWidth: 15 },
+    { matColumnDef: 'fee', headerCellDef: 'Fee', headerWidth: 20 },
+    { matColumnDef: 'height', headerCellDef: 'Height', headerWidth: 12 },
   ];
 
   templatesToken: Array<TableTemplate> = [
@@ -238,13 +239,17 @@ export class AccountTransactionTableComponent {
           payload['receiver'] = address;
         }
         this.templates = [...this.templatesToken];
-        this.templates.push({ matColumnDef: 'tokenId', headerCellDef: 'Token ID', headerWidth: 15 });
+        this.templates.push({ matColumnDef: 'tokenId', headerCellDef: 'Token ID', headerWidth: 17 });
         this.displayedColumns = this.templates.map((dta) => dta.matColumnDef);
         this.getListNFTByAddress(payload);
         break;
       default:
         break;
     }
+
+    setTimeout(() => {
+      this.transactionLoading = false;
+    }, 5000);
   }
 
   getListTypeFilter() {
