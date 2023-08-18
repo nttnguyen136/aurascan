@@ -15,7 +15,7 @@ import { Globals, convertDataTransaction } from '../../../app/global/global';
 export class TransactionComponent implements OnInit {
   templates: Array<TableTemplate> = [
     { matColumnDef: 'tx_hash', headerCellDef: 'Tx Hash' },
-    { matColumnDef: 'type', headerCellDef: 'Type' },
+    { matColumnDef: 'type', headerCellDef: 'Message' },
     { matColumnDef: 'status', headerCellDef: 'Result' },
     { matColumnDef: 'fee', headerCellDef: 'Fee' },
     { matColumnDef: 'height', headerCellDef: 'Height' },

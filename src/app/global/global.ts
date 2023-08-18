@@ -376,6 +376,7 @@ export function convertDataAccountTransaction(data, coinInfo, modeQuery, setRece
     const fee = balanceOf(_.get(element, 'fee[0].amount') || 0, coinInfo.coinDecimals).toFixed(coinInfo.coinDecimals);
     const height = _.get(element, 'height');
     const timestamp = _.get(element, 'timestamp');
+    let limit = 5;
     let fromAddress;
     let toAddress;
     let arrEvent;
@@ -400,7 +401,7 @@ export function convertDataAccountTransaction(data, coinInfo, modeQuery, setRece
       case TabsAccount.FtsTxs:
         arrEvent = _.get(element, 'events').map((item, index) => {
           let type = getTypeTx(element);
-          let fromAddress = _.get(item, 'smart_contract_events[0].cw20_activities[0].from');
+          let fromAddress = _.get(item, 'smart_contract_events[0].cw20_activities[0].from') || NULL_ADDRESS;
           let toAddress = _.get(item, 'smart_contract_events[0].cw20_activities[0].to') || NULL_ADDRESS;
           let denom = _.get(item, 'smart_contract_events[0].smart_contract.cw20_contract.symbol');
           let amountTemp = _.get(item, 'smart_contract_events[0].cw20_activities[0].amount');
@@ -412,7 +413,7 @@ export function convertDataAccountTransaction(data, coinInfo, modeQuery, setRece
       case TabsAccount.NftTxs:
         arrEvent = _.get(element, 'events').map((item, index) => {
           let type = getTypeTx(element);
-          let fromAddress = _.get(item, 'smart_contract_events[0].cw721_activity.sender');
+          let fromAddress = _.get(item, 'smart_contract_events[0].cw721_activity.from') || NULL_ADDRESS;
           let toAddress = _.get(item, 'smart_contract_events[0].cw721_activity.to') || NULL_ADDRESS;
           let contractAddress = _.get(element, 'transaction_messages[0].content.contract');
           let dataTemp = _.get(element, 'transaction_messages[0].content.msg');
@@ -458,6 +459,7 @@ export function convertDataAccountTransaction(data, coinInfo, modeQuery, setRece
       tokenId,
       contractAddress,
       arrEvent,
+      limit,
     };
   });
   return txs;

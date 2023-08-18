@@ -1,7 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { CodeTransaction } from '../../../../core/constants/transaction.enum';
 import { CommonService } from 'src/app/core/services/common.service';
-import { TabsAccount } from 'src/app/core/constants/account.enum';
+import { AccountTxType, TabsAccount } from 'src/app/core/constants/account.enum';
+import { EnvironmentService } from 'src/app/core/data-services/environment.service';
 
 export interface CardMobSimpleValidatorAddress {
   imgUrl: string;
@@ -54,23 +55,28 @@ export class CardMobAccountComponent implements OnInit {
   @Input() tokenAmount: CardMobSimpleAmount;
   @Input() dataCard: any;
   @Input() modeQuery: string;
+  @Input() currentAddress: string;
+  @Input() currentType: string;
+  @Input() expand: boolean = false;
 
   tabsData = TabsAccount;
   statusTransaction = CodeTransaction;
+  address = 'toAddress';
 
-  constructor(public commonService: CommonService) {}
+  denom = this.environmentService.configValue.chain_info.currencies[0].coinDenom;
+  constructor(public commonService: CommonService, private environmentService: EnvironmentService) {}
 
   ngOnInit(): void {
     if (this.modeQuery !== this.tabsData.ExecutedTxs) {
       this.content[this.content.length - 1].label = 'Expand';
     }
+    if (this.currentType === AccountTxType.Received) {
+      this.address = 'fromAddress';
+    }
+    this.dataCard.expand = this.expand;
   }
 
   expandData(data) {
-    if (data.arrEvent?.length <= 1) {
-      return;
-    }
-
     data.expand = true;
   }
 }

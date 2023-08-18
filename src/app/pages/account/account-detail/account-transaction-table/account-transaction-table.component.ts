@@ -5,7 +5,7 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { TabsAccount } from 'src/app/core/constants/account.enum';
+import { AccountTxType, TabsAccount } from 'src/app/core/constants/account.enum';
 import { DATEFORMAT, PAGE_EVENT } from 'src/app/core/constants/common.constant';
 import { MAX_LENGTH_SEARCH_TOKEN } from 'src/app/core/constants/token.constant';
 import { TYPE_TRANSACTION } from 'src/app/core/constants/transaction.constant';
@@ -35,7 +35,7 @@ export class AccountTransactionTableComponent {
 
   templatesExecute: Array<TableTemplate> = [
     { matColumnDef: 'tx_hash', headerCellDef: 'Tx Hash', headerWidth: 18 },
-    { matColumnDef: 'type', headerCellDef: 'Type', headerWidth: 20 },
+    { matColumnDef: 'type', headerCellDef: 'Message', headerWidth: 20 },
     { matColumnDef: 'status', headerCellDef: 'Result', headerWidth: 12 },
     { matColumnDef: 'timestamp', headerCellDef: 'Time', headerWidth: 15 },
     { matColumnDef: 'fee', headerCellDef: 'Fee', headerWidth: 20 },
@@ -43,13 +43,12 @@ export class AccountTransactionTableComponent {
   ];
 
   templatesToken: Array<TableTemplate> = [
-    { matColumnDef: 'expand', headerCellDef: '', headerWidth: 4 },
-    { matColumnDef: 'tx_hash', headerCellDef: 'Tx Hash', headerWidth: 12 },
-    { matColumnDef: 'type', headerCellDef: 'Type', headerWidth: 15 },
+    { matColumnDef: 'tx_hash', headerCellDef: 'Tx Hash', headerWidth: 14 },
+    { matColumnDef: 'type', headerCellDef: 'Message', headerWidth: 15 },
     { matColumnDef: 'status', headerCellDef: 'Result', headerWidth: 8 },
     { matColumnDef: 'timestamp', headerCellDef: 'Time', headerWidth: 12 },
-    { matColumnDef: 'fromAddress', headerCellDef: 'From', headerWidth: 14 },
-    { matColumnDef: 'toAddress', headerCellDef: 'To', headerWidth: 14 },
+    { matColumnDef: 'fromAddress', headerCellDef: 'From', headerWidth: 18 },
+    { matColumnDef: 'toAddress', headerCellDef: 'To', headerWidth: 18 },
   ];
 
   displayedColumns: string[];
@@ -73,11 +72,13 @@ export class AccountTransactionTableComponent {
   tnxType = [];
   tnxTypeOrigin = [];
   listTypeSelected = '';
-  isSent = true;
+  currentType = AccountTxType.Sent;
+  accountTxType = AccountTxType;
   isSearch = false;
   minDate;
   maxDate;
   linkToken = 'token-nft';
+  typeTx = [AccountTxType.Sent, AccountTxType.Received];
 
   breakpoint$ = this.layout.observe([Breakpoints.Small, Breakpoints.XSmall]);
   denom = this.environmentService.configValue.chain_info.currencies[0].coinDenom;
@@ -172,8 +173,8 @@ export class AccountTransactionTableComponent {
     this.getTxsAddress();
   }
 
-  changeType(isSent = true) {
-    this.isSent = isSent;
+  changeType(currentType = AccountTxType.Sent) {
+    this.currentType = currentType;
     this.searchType();
   }
 
@@ -213,7 +214,7 @@ export class AccountTransactionTableComponent {
         break;
       case TabsAccount.AuraTxs:
         payload.compositeKey = 'transfer.sender';
-        if (!this.isSent) {
+        if (this.currentType !== AccountTxType.Sent) {
           payload.compositeKey = 'transfer.recipient';
         }
         this.templates = [...this.templatesToken];
@@ -222,7 +223,7 @@ export class AccountTransactionTableComponent {
         this.getListTxAuraByAddress(payload);
         break;
       case TabsAccount.FtsTxs:
-        if (this.isSent) {
+        if (this.currentType === AccountTxType.Sent) {
           payload['sender'] = address;
         } else {
           payload['receiver'] = address;
@@ -233,7 +234,7 @@ export class AccountTransactionTableComponent {
         this.getListFTByAddress(payload);
         break;
       case TabsAccount.NftTxs:
-        if (this.isSent) {
+        if (this.currentType === AccountTxType.Sent) {
           payload['sender'] = address;
         } else {
           payload['receiver'] = address;
@@ -327,7 +328,7 @@ export class AccountTransactionTableComponent {
       }
 
       let setReceive = false;
-      if (this.modeQuery !== TabsAccount.ExecutedTxs && !this.isSent) {
+      if (this.modeQuery !== TabsAccount.ExecutedTxs && this.currentType !== AccountTxType.Sent) {
         setReceive = true;
       }
 
@@ -347,12 +348,16 @@ export class AccountTransactionTableComponent {
     }
   }
 
+  seeMoreData(data) {
+    data.limit += 6;
+  }
+
   expandData(data) {
     if (data.arrEvent?.length <= 1) {
       return;
     }
-
-    data.expand = true;
+    data.limit = 6;
+    data.expand = !data.expand;
   }
 
   paginatorEmit(e: MatPaginator): void {

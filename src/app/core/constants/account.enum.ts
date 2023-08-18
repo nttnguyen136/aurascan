@@ -65,3 +65,8 @@ export enum EAccountType {
   PeriodicVestingAccount = 'cosmos-sdk/PeriodicVestingAccount',
   DelayedVestingAccount = 'cosmos-sdk/DelayedVestingAccount',
 }
+
+export enum AccountTxType {
+  Sent = 'Sent',
+  Received = 'Received',
+}

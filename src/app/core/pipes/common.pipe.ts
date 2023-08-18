@@ -127,16 +127,17 @@ export class displayTypeToolTip implements PipeTransform {
   transform(value: any): string {
     let result = '';
     value.forEach((element, index) => {
-      if (index < 5) {
+      if (index <= 4) {
         if (result?.length > 0) {
           result += ', ' + element.type;
         } else {
           result += element.type;
         }
-      } else {
-        result += ', ...'
       }
     });
+    if (value?.length > 4) {
+      result += ', ...';
+    }
     return result;
   }
 }

@@ -33,7 +33,7 @@ export class MyGranteesComponent implements OnInit {
   templatesActive: Array<TableTemplate> = [
     { matColumnDef: 'tx_hash', headerCellDef: 'TX HASH' },
     { matColumnDef: 'grantee', headerCellDef: 'GRANTEE' },
-    { matColumnDef: 'type', headerCellDef: 'TYPE' },
+    { matColumnDef: 'type', headerCellDef: 'Message' },
     { matColumnDef: 'timestamp', headerCellDef: 'TIME' },
     { matColumnDef: 'limit', headerCellDef: 'SPEND LIMIT' },
     { matColumnDef: 'expiration', headerCellDef: 'EXPIRATION' },
@@ -43,7 +43,7 @@ export class MyGranteesComponent implements OnInit {
   templatesInActive: Array<TableTemplate> = [
     { matColumnDef: 'tx_hash', headerCellDef: 'TX HASH' },
     { matColumnDef: 'grantee', headerCellDef: 'GRANTEE' },
-    { matColumnDef: 'type', headerCellDef: 'TYPE' },
+    { matColumnDef: 'type', headerCellDef: 'Message' },
     { matColumnDef: 'timestamp', headerCellDef: 'TIME' },
     { matColumnDef: 'limit', headerCellDef: 'SPEND LIMIT' },
     { matColumnDef: 'expiration', headerCellDef: 'EXPIRATION' },

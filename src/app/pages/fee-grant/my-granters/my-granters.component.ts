@@ -26,7 +26,7 @@ export class MyGrantersComponent implements OnInit {
   templatesActive: Array<TableTemplate> = [
     { matColumnDef: 'tx_hash', headerCellDef: 'TX HASH' },
     { matColumnDef: 'granter', headerCellDef: 'GRANTER' },
-    { matColumnDef: 'type', headerCellDef: 'TYPE' },
+    { matColumnDef: 'type', headerCellDef: 'Message' },
     { matColumnDef: 'timestamp', headerCellDef: 'TIME' },
     { matColumnDef: 'limit', headerCellDef: 'SPEND LIMIT' },
     { matColumnDef: 'expiration', headerCellDef: 'EXPIRATION' },
@@ -35,7 +35,7 @@ export class MyGrantersComponent implements OnInit {
   templatesInActive: Array<TableTemplate> = [
     { matColumnDef: 'tx_hash', headerCellDef: 'TX HASH' },
     { matColumnDef: 'granter', headerCellDef: 'GRANTER' },
-    { matColumnDef: 'type', headerCellDef: 'TYPE' },
+    { matColumnDef: 'type', headerCellDef: 'Message' },
     { matColumnDef: 'timestamp', headerCellDef: 'TIME' },
     { matColumnDef: 'limit', headerCellDef: 'SPEND LIMIT' },
     { matColumnDef: 'expiration', headerCellDef: 'EXPIRATION' },

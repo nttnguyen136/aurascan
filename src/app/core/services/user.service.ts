@@ -175,7 +175,7 @@ export class UserService extends CommonService {
             content
             type
           }
-          events(where: {smart_contract_events: {cw20_activities: {id: {_is_null: false}}}}) {
+          events(where: {smart_contract_events: {cw20_activities: {from: {_eq: $sender}, to: {_eq: $receiver}, id: {_is_null: false}}}}) {
             smart_contract_events {
               cw20_activities {
                 amount
@@ -225,7 +225,7 @@ export class UserService extends CommonService {
             content
             type
           }
-          events(where: {smart_contract_events: {cw721_activity: {id: {_is_null: false}}}}) {
+          events(where: {smart_contract_events: {cw721_activity: {id: {_is_null: false}, from: {_eq: $sender}, to: {_eq: $receiver}}}}) {
             smart_contract_events {
               cw721_activity {
                 action
@@ -239,6 +239,7 @@ export class UserService extends CommonService {
         }
       }
     }
+    
     `;
     return this.http
       .post<any>(this.graphUrl, {
