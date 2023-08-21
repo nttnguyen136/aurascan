@@ -1,6 +1,6 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { DatePipe } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
@@ -14,6 +14,7 @@ import { TableTemplate } from 'src/app/core/models/common.model';
 import { CommonService } from 'src/app/core/services/common.service';
 import { UserService } from 'src/app/core/services/user.service';
 import { Globals, convertDataAccountTransaction } from 'src/app/global/global';
+import { PaginatorComponent } from 'src/app/shared/components/paginator/paginator.component';
 
 @Component({
   selector: 'app-account-transaction-table',
@@ -21,6 +22,7 @@ import { Globals, convertDataAccountTransaction } from 'src/app/global/global';
   styleUrls: ['./account-transaction-table.component.scss'],
 })
 export class AccountTransactionTableComponent {
+  @ViewChild(PaginatorComponent) pageChange: PaginatorComponent;
   @Input() address: string;
   @Input() modeQuery: string;
   @Input() displayType: boolean = false;
@@ -47,8 +49,8 @@ export class AccountTransactionTableComponent {
     { matColumnDef: 'type', headerCellDef: 'Message', headerWidth: 15 },
     { matColumnDef: 'status', headerCellDef: 'Result', headerWidth: 8 },
     { matColumnDef: 'timestamp', headerCellDef: 'Time', headerWidth: 12 },
-    { matColumnDef: 'fromAddress', headerCellDef: 'From', headerWidth: 18 },
-    { matColumnDef: 'toAddress', headerCellDef: 'To', headerWidth: 18 },
+    { matColumnDef: 'fromAddress', headerCellDef: 'From', headerWidth: 17 },
+    { matColumnDef: 'toAddress', headerCellDef: 'To', headerWidth: 17 },
   ];
 
   displayedColumns: string[];
@@ -164,12 +166,13 @@ export class AccountTransactionTableComponent {
     this.listTypeSelected = '';
   }
 
-  searchType() {
+  searchType(isSearch = true) {
     this.transactionLoading = true;
     this.dataSource = new MatTableDataSource();
     this.pageData.length = 0;
+    this.pageData.pageIndex = 0;
     this.nextKey = null;
-    this.isSearch = true;
+    this.isSearch = isSearch;
     this.getTxsAddress();
   }
 
@@ -213,14 +216,14 @@ export class AccountTransactionTableComponent {
         this.getListTxByAddress(payload);
         break;
       case TabsAccount.AuraTxs:
-        payload.compositeKey = 'transfer.sender';
+        payload.compositeKey = 'coin_spent.spender';
         if (this.currentType !== AccountTxType.Sent) {
-          payload.compositeKey = 'transfer.recipient';
+          payload.compositeKey = 'coin_received.receiver';
         }
         this.templates = [...this.templatesToken];
         this.templates.push({ matColumnDef: 'amount', headerCellDef: 'Amount', headerWidth: 15 });
         this.displayedColumns = this.templates.map((dta) => dta.matColumnDef);
-        this.getListTxAuraByAddress(payload);
+        // this.getListTxAuraByAddress(payload);
         break;
       case TabsAccount.FtsTxs:
         if (this.currentType === AccountTxType.Sent) {

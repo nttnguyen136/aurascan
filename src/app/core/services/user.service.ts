@@ -122,7 +122,7 @@ export class UserService extends CommonService {
 
   getListTxAuraByAddress(payload) {
     const operationsDoc = `
-    query QueryTxEventsOfAccount($compositeKey: String = null, $address: String = null, $startTime: timestamptz = null, $endTime: timestamptz = null, $limit: Int = null, $listTxMsgType: [String!] = null, $heightGT: Int = null, $heightLT: Int = null, $orderHeight: order_by = desc) {
+    query QueryTxMsgOfAccount($compositeKey: String = null, $address: String = null, $startTime: timestamptz = null, $endTime: timestamptz = null, $limit: Int = null, $listTxMsgType: [String!] = null, $heightGT: Int = null, $heightLT: Int = null, $orderHeight: order_by = desc) {
       ${this.envDB} {
         transaction(where: {event_attribute_index: {composite_key: {_eq: $compositeKey}, value: {_eq: $address}}, timestamp: {_lte: $endTime, _gte: $startTime}, transaction_messages: {type: {_in: $listTxMsgType}}, _and: [{height: {_gt: $heightGT, _lt: $heightLT}}]}, limit: $limit, order_by: {height: $orderHeight}) {
           hash
@@ -132,17 +132,11 @@ export class UserService extends CommonService {
           code
           transaction_messages {
             type
-          }
-          events(where: {type: {_eq: "transfer"}, event_attributes: {composite_key: {_eq: $compositeKey}, value: {_eq: $address}}}) {
-            event_attributes {
-              key
-              value
-            }
+            content
           }
         }
       }
     }
-    
     `;
     return this.http
       .post<any>(this.graphUrl, {
@@ -156,7 +150,7 @@ export class UserService extends CommonService {
           startTime: payload.startTime,
           endTime: payload.endTime,
         },
-        operationName: 'QueryTxEventsOfAccount',
+        operationName: 'QueryTxMsgOfAccount',
       })
       .pipe(map((res) => (res?.data ? res?.data[this.envDB] : null)));
   }

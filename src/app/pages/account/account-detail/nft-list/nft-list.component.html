@@ -109,7 +109,10 @@
       </div>
     </ng-container>
     <ng-template #noValues>
-      <app-table-no-data [textNull]="'Kindly select the collections'" *ngIf="!loading"></app-table-no-data>
+      <app-table-no-data
+        [textNull]="'Kindly select the collections'"
+        [img]="'assets/images/noItemNFT.png'"
+        *ngIf="!loading"></app-table-no-data>
     </ng-template>
   </div>
 </div>

@@ -388,8 +388,8 @@ export function convertDataAccountTransaction(data, coinInfo, modeQuery, setRece
         type = getTypeTx(element);
         break;
       case TabsAccount.AuraTxs:
-        arrEvent = _.get(element, 'events').map((item, index) => {
-          let type = _.get(element, 'transaction_messages[0].content["@type"]');
+        arrEvent = _.get(element, 'transaction_messages')?.map((item, index) => {
+          let type = _.get(item, 'type');
           let fromAddress = _.get(item, 'event_attributes[1].value');
           let toAddress = _.get(item, 'event_attributes[0].value');
           let amountTemp = _.get(item, 'event_attributes[2].value')?.match(/\d+/g)[0];
@@ -399,7 +399,7 @@ export function convertDataAccountTransaction(data, coinInfo, modeQuery, setRece
         });
         break;
       case TabsAccount.FtsTxs:
-        arrEvent = _.get(element, 'events').map((item, index) => {
+        arrEvent = _.get(element, 'events')?.map((item, index) => {
           let type = getTypeTx(element);
           let fromAddress = _.get(item, 'smart_contract_events[0].cw20_activities[0].from') || NULL_ADDRESS;
           let toAddress = _.get(item, 'smart_contract_events[0].cw20_activities[0].to') || NULL_ADDRESS;
@@ -411,7 +411,7 @@ export function convertDataAccountTransaction(data, coinInfo, modeQuery, setRece
         });
         break;
       case TabsAccount.NftTxs:
-        arrEvent = _.get(element, 'events').map((item, index) => {
+        arrEvent = _.get(element, 'events')?.map((item, index) => {
           let type = getTypeTx(element);
           let fromAddress = _.get(item, 'smart_contract_events[0].cw721_activity.from') || NULL_ADDRESS;
           let toAddress = _.get(item, 'smart_contract_events[0].cw721_activity.to') || NULL_ADDRESS;
