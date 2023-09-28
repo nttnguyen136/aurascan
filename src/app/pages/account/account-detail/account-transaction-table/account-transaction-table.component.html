@@ -115,6 +115,7 @@
             class="mat-menu-trigger input-group align-items-center d-flex justify-content-between text--white cursor-pointer btn-tns"
             type="button"
             id="typeTransfer"
+            #typeTransfer
             [class.menu-hidden]="transactionFilter.typeTransfer"
             data-bs-toggle="dropdown"
             aria-expanded="false">
@@ -129,7 +130,11 @@
               <i class="ph ph-caret-up text--white body"></i>
             </div>
           </button>
-          <ul class="dropdown-menu aura-dropdown-menu" id="typeAction" #typeAction>
+          <ul
+            class="dropdown-menu aura-dropdown-menu"
+            id="typeSelect"
+            #typeAction
+            (clickOutside)="typeAction.classList.remove('show')">
             <li class="dropdown-item cursor-pointer py-2 body" (click)="changeTypeFilter('All type')">
               <button type="button" class="button p-0">All type</button>
             </li>

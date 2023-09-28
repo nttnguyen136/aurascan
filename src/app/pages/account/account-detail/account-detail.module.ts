@@ -30,6 +30,7 @@ import { AccountTransactionTableComponent } from './account-transaction-table/ac
 import { AccountTransactionComponent } from './account-transaction/account-transaction.component';
 import { NftListComponent } from './nft-list/nft-list.component';
 import { TokenTableComponent } from './token-table/token-table.component';
+import { ClickOutsideModule } from 'ng-click-outside';
 
 @NgModule({
   declarations: [
@@ -63,6 +64,7 @@ import { TokenTableComponent } from './token-table/token-table.component';
     NameTagModule,
     TooltipCustomizeModule,
     ClipboardModule,
+    ClickOutsideModule,
     RouterModule
   ],
   providers: [TransactionService, AccountService, DecimalPipe, UserService],
