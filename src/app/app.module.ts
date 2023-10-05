@@ -38,7 +38,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgbModule, NgbNavModule, NgbPopoverModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import { IConfig, NgxMaskModule } from 'ngx-mask';
+import { IConfig, NgxMaskDirective, NgxMaskPipe, provideEnvironmentNgxMask } from 'ngx-mask';
 import { NgProgressModule } from 'ngx-progressbar';
 import { ToastrModule } from 'ngx-toastr';
 import { AppRoutingModule } from './app-routing.module';
@@ -52,21 +52,22 @@ import { LoadingInterceptor } from './core/interceptors/loading.interceptor';
 import { CommonService } from './core/services/common.service';
 import { FeeGrantService } from './core/services/feegrant.service';
 import { MappingErrorService } from './core/services/mapping-error.service';
+import { NameTagService } from './core/services/name-tag.service';
 import { SoulboundService } from './core/services/soulbound.service';
 import { TokenService } from './core/services/token.service';
+import { UserService } from './core/services/user.service';
 import { Globals } from './global/global';
 import { LayoutsModule } from './layouts/layouts.module';
 import { SchemaViewerModule } from './pages/schema-viewer/schema-viewer.module';
 import { MediaExpandModule } from './shared/components/media-expand/media-expand.module';
-import { NameTagService } from './core/services/name-tag.service';
-import { UserService } from './core/services/user.service';
 
 export function createTranslateLoader(http: HttpClient): any {
   return new TranslateHttpLoader(http, 'assets/i18n/', '.json');
 }
-
-const maskConfig: Partial<IConfig> = {
-  thousandSeparator: ',',
+const maskConfigFunction: () => Partial<IConfig> = () => {
+  return {
+    thousandSeparator: ',',
+  };
 };
 
 export const MY_FORMATS = {
@@ -144,7 +145,8 @@ export class MaterialModule {}
     NgbPopoverModule,
     NgbNavModule,
     ToastrModule.forRoot({ positionClass: 'inline', maxOpened: 2 }),
-    NgxMaskModule.forRoot(maskConfig),
+    NgxMaskDirective,
+    NgxMaskPipe,
     ReactiveFormsModule,
     FormsModule,
     MatDatepickerModule,
@@ -184,6 +186,8 @@ export class MaterialModule {}
       deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
     },
     { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+
+    provideEnvironmentNgxMask(maskConfigFunction),
   ],
   bootstrap: [AppComponent],
 })

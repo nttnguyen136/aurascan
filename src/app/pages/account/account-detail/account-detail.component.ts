@@ -45,7 +45,7 @@ export class AccountDetailComponent implements OnInit {
   modalReference: any;
   isNoData = false;
 
-  destroyed$ = new Subject();
+  destroyed$ = new Subject<void>();
   timerUnSub: Subscription;
   breakpoint$ = this.layout.observe([Breakpoints.Small, Breakpoints.XSmall]).pipe(takeUntil(this.destroyed$));
   timeStaking = `${this.environmentService.configValue.timeStaking}`;
@@ -76,8 +76,8 @@ export class AccountDetailComponent implements OnInit {
     this.timeStaking = (Number(this.timeStaking) / DATE_TIME_WITH_MILLISECOND).toString();
     this.chartCustomOptions = [...ACCOUNT_WALLET_COLOR];
     this.route.params.subscribe((params) => {
-      if (params?.address) {
-        this.currentAddress = params?.address;
+      if (params?.['address']) {
+        this.currentAddress = params?.['address'];
         this.isContractAddress = isContract(this.currentAddress);
         this.loadDataTemp();
         this.getAccountDetail();

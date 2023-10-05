@@ -44,7 +44,7 @@ export class PrivateNameTagComponent implements OnInit, OnDestroy {
   };
   textSearch = '';
   searchSubject = new Subject();
-  destroy$ = new Subject();
+  destroy$ = new Subject<void>();
   dataSource: MatTableDataSource<any> = new MatTableDataSource<any>([]);
   dataSourceMobile = [];
   dataTable = [];

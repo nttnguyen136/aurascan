@@ -8,7 +8,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { NgxMaskModule } from 'ngx-mask';
+import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
 import { CommonPipeModule } from '../../../core/pipes/common-pipe.module';
 import { TableNoDataModule } from '../../../shared/components/table-no-data/table-no-data.module';
 import { PopupDelegateComponent } from './popup-delegate.component';
@@ -27,8 +27,9 @@ import { PopupDelegateComponent } from './popup-delegate.component';
     RouterModule,
     TableNoDataModule,
     FormsModule,
-    NgxMaskModule
+    NgxMaskDirective,
+    NgxMaskPipe,
   ],
-  exports: [PopupDelegateComponent]
+  exports: [PopupDelegateComponent],
 })
-export class PopupDelegateModule { }
+export class PopupDelegateModule {}

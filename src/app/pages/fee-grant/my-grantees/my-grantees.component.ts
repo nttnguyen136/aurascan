@@ -59,7 +59,7 @@ export class MyGranteesComponent implements OnInit {
   };
   isNoData = true;
   currentAddress = null;
-  destroyed$ = new Subject();
+  destroyed$ = new Subject<void>();
   timerGetFeeGrant: any;
   isSearchData = false;
   denom = this.environmentService.configValue.chain_info.currencies[0].coinDenom;

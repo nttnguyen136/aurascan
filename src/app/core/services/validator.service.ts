@@ -12,8 +12,8 @@ import { LCD_COSMOS } from '../constants/url.constant';
   providedIn: 'root',
 })
 export class ValidatorService extends CommonService {
-  apiUrl = `${this.environmentService.configValue.beUri}`;
-  chainInfo = this.environmentService.configValue.chain_info;
+  override apiUrl = `${this.environmentService.configValue.beUri}`;
+  override chainInfo = this.environmentService.configValue.chain_info;
   stakingAPRSubject: BehaviorSubject<number>;
 
   constructor(

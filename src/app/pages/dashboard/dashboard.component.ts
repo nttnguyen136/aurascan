@@ -3,7 +3,7 @@ import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit } from '
 import { MatTableDataSource } from '@angular/material/table';
 import { IChartApi, ISeriesApi, createChart } from 'lightweight-charts';
 import * as moment from 'moment';
-import { MaskPipe } from 'ngx-mask';
+import { NgxMaskPipe } from 'ngx-mask';
 import { Subject, Subscription, of, timer } from 'rxjs';
 import { debounceTime, switchMap, takeUntil } from 'rxjs/operators';
 import { VOTING_STATUS } from 'src/app/core/constants/proposal.constant';
@@ -91,7 +91,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   cacheData = [];
   logicalRangeChange$ = new Subject<{ from: number; to: number }>();
   endData = false;
-  destroy$ = new Subject();
+  destroy$ = new Subject<void>();
   isMobileMatched = false;
   breakpoint$ = this.breakpointObserver.observe([Breakpoints.Small, Breakpoints.XSmall]).pipe(takeUntil(this.destroy$));
   currentAddress = null;
@@ -105,7 +105,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     public datepipe: DatePipe,
     private proposalService: ProposalService,
-    private maskService: MaskPipe,
+    private maskService: NgxMaskPipe,
     private token: TokenService,
     private walletService: WalletService,
     private validatorService: ValidatorService,
@@ -242,7 +242,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       scaleMargins: {
         top: 0.3,
         bottom: 0.4,
-      }
+      },
     });
   }
 

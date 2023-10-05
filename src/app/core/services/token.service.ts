@@ -11,7 +11,7 @@ import * as _ from 'lodash';
 
 @Injectable()
 export class TokenService extends CommonService {
-  chainInfo = this.environmentService.configValue.chain_info;
+  override chainInfo = this.environmentService.configValue.chain_info;
 
   constructor(private http: HttpClient, private environmentService: EnvironmentService) {
     super(http, environmentService);

@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgbNavModule, NgbProgressbarModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
-import { NgxMaskModule } from 'ngx-mask';
+import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
 import { ValidatorService } from 'src/app/core/services/validator.service';
 import { LoadingImageModule } from 'src/app/shared/components/loading-image/loading-image.module';
 import { CommonPipeModule } from '../../../app/core/pipes/common-pipe.module';
@@ -51,7 +51,8 @@ import { TooltipCustomizeModule } from 'src/app/shared/components/tooltip-custom
     CommonPipeModule,
     NgbProgressbarModule,
     NgbNavModule,
-    NgxMaskModule,
+    NgxMaskDirective,
+    NgxMaskPipe,
     TableNoDataModule,
     PaginatorModule,
     LoadingImageModule,

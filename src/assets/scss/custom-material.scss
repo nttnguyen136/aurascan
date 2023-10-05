@@ -1,19 +1,17 @@
-@import "~@angular/material/theming";
+@import '@angular/material/theming';
 $custom-typography: mat-typography-config(
-    $font-family: 'Roboto, "Helvetica Neue", sans-serif',
+  $font-family: 'Roboto, "Helvetica Neue", sans-serif',
 );
 @include angular-material-typography($custom-typography);
 * {
-    font-family:'Inter' , Roboto, "Helvetica Neue", sans-serif;
+  font-family: 'Inter', Roboto, 'Helvetica Neue', sans-serif;
 }
 
 .mat-table {
-    width: 100%;
+  width: 100%;
 }
 
-
-.transparent-dialog .mat-dialog-container  
-{
- background: transparent !important;
- box-shadow: none
+.transparent-dialog .mat-dialog-container {
+  background: transparent !important;
+  box-shadow: none;
 }

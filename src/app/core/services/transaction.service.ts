@@ -9,8 +9,8 @@ import { CommonService } from './common.service';
 
 @Injectable()
 export class TransactionService extends CommonService {
-  apiUrl = `${this.environmentService.configValue.beUri}`;
-  chainInfo = this.environmentService.configValue.chain_info;
+  override apiUrl = `${this.environmentService.configValue.beUri}`;
+  override chainInfo = this.environmentService.configValue.chain_info;
 
   constructor(private http: HttpClient, private environmentService: EnvironmentService) {
     super(http, environmentService);
@@ -196,12 +196,12 @@ export class TransactionService extends CommonService {
         query: operationsDoc,
         variables: {
           limit: 100,
-          order: "desc",
+          order: 'desc',
           value: payload.value,
           heightGT: null,
           indexGT: null,
           indexLT: null,
-          height: null
+          height: null,
         },
         operationName: 'queryProposalDeposit',
       })

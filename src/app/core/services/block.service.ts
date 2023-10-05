@@ -8,7 +8,7 @@ import { CommonService } from './common.service';
 
 @Injectable()
 export class BlockService extends CommonService {
-  apiUrl = `${this.environmentService.configValue.beUri}`;
+  override apiUrl = `${this.environmentService.configValue.beUri}`;
 
   constructor(private http: HttpClient, private environmentService: EnvironmentService) {
     super(http, environmentService);

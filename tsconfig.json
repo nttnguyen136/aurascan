@@ -20,7 +20,8 @@
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
-    "noPropertyAccessFromIndexSignature": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "allowSyntheticDefaultImports": true,
     "noImplicitOverride": true,
     "lib": ["ES2022", "dom"],
     "paths": {
