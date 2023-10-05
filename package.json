@@ -35,7 +35,7 @@
     "date-fns": "^2.30.0",
     "export-xlsx": "^0.1.4",
     "jsonschema": "^1.4.1",
-    "lightweight-charts": "^4.1.0",
+    "lightweight-charts": "^3.8.0",
     "marked": "^9.1.0",
     "ng-apexcharts": "^1.8.0",
     "ng-click-outside": "^9.0.1",
