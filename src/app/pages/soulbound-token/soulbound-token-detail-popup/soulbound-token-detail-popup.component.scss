@@ -1,12 +1,6 @@
 ::ng-deep .TokenSoulboundDetailPopup {
   max-width: 90vw !important;
   transform: translateY(-50px);
-  .mat-dialog-container {
-    background: transparent;
-    box-shadow: none;
-    padding: 0;
-    overflow: visible;
-  }
 }
 
 .card-header {
@@ -91,10 +85,9 @@
     @media (min-width: 991.98px) {
       max-height: 244px;
       .__description {
-      overflow-y: auto;
-      height: 80px;
+        overflow-y: auto;
+        height: 80px;
       }
-
     }
   }
 

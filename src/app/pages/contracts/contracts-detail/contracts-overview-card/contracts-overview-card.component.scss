@@ -5,6 +5,9 @@
   overflow: hidden;
   @media (min-width: 991.98px) {
     border-radius: 12px;
+    &.card {
+      min-height: 247px;
+    }
   }
   .card__header {
     padding: var(--spacer-4);
@@ -25,7 +28,7 @@
     background-color: var(--aura-gray-10) !important;
     display: block !important;
     border: none !important;
-    transition: all .35s ease-in-out;
+    transition: all 0.35s ease-in-out;
     overflow: hidden;
     height: unset !important;
     @media (max-width: 992px) {

@@ -36,11 +36,6 @@
   @media (max-width: 567px) {
     max-width: 95vw !important;
   }
-  .mat-dialog-container {
-    background: none;
-    box-shadow: none;
-    padding: 0;
-  }
 }
 .cdk-overlay-dark-backdrop {
   background: rgba(0, 0, 0, 0.7);
@@ -58,4 +53,18 @@
   min-width: 0 !important;
   overflow: hidden !important;
   border: none !important;
+}
+
+.mat-dialog-container {
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  overflow: visible;
+  .card {
+    max-width: 90vw;
+    &.popup-small {
+      max-width: 550px;
+      min-width: 300px;
+    }
+  }
 }
