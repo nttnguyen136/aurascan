@@ -1,30 +1,21 @@
-/*
-Template Name: Minia - Admin & Dashboard Template
-Author: Themesbrand
-Version: 1.1.0
-Website: https://themesbrand.com/
-Contact: themesbrand@gmail.com
-File: Main Css File
-*/
-
 //Core files
-@import "~/node_modules/bootstrap/scss/functions";
-@import "~/node_modules/bootstrap/scss/variables";
-@import "variables";
-@import "~/node_modules/bootstrap/scss/mixins.scss";
+@import '../../../node_modules/bootstrap/scss/functions';
+@import '../../../node_modules/bootstrap/scss/variables';
+@import 'variables';
+@import '../../../node_modules/bootstrap/scss/mixins.scss';
 // Structure
-@import "custom/structure/general";
-@import "custom/structure/topbar";
-@import "custom/structure/page-head";
-@import "custom/structure/footer";
-@import "custom/structure/right-sidebar";
-@import "custom/structure/vertical";
-@import "custom/structure/horizontal-nav";
-@import "custom/structure/layouts";
+// @import "custom/structure/general";
+@import 'custom/structure/topbar';
+// @import "custom/structure/page-head";
+// @import "custom/structure/footer";
+@import 'custom/structure/right-sidebar';
+@import 'custom/structure/vertical';
+@import 'custom/structure/horizontal-nav';
+@import 'custom/structure/layouts';
 // Components
-@import "custom/components/forms";
+@import 'custom/components/forms';
 // Plugins
-@import "custom/plugins/apexcharts";
+@import 'custom/plugins/apexcharts';
 // @import "custom/plugins/echarts";
 // Pages
 // @import "custom/pages/authentication";
@@ -34,5 +25,5 @@ File: Main Css File
 // @import "custom/pages/timeline";
 // @import "custom/pages/extras-pages";
 // Custom Scss
-@import "./custom.scss";
-@import "./spacer.scss";
+@import './custom.scss';
+@import './spacer.scss';

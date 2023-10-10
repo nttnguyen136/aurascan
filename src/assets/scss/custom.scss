@@ -1,5 +1,5 @@
 // regular style toast
-@import '~ngx-toastr/toastr';
+@import 'ngx-toastr/toastr';
 
 // Custom Dashboard Css
 .activity-wid .activity-list:last-child::before {
@@ -440,7 +440,7 @@ body {
 
 .g-flex-start-center {
   display: flex !important;
-  justify-content: start !important;
+  justify-content: flex-start !important;
   align-items: center !important;
 }
 

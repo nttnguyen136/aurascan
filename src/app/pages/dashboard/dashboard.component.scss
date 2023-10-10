@@ -99,8 +99,8 @@
     }
   }
   &__3 {
-   background-color: unset;
-   max-width: unset;
+    background-color: unset;
+    max-width: unset;
   }
 }
 .card-summary-info {
@@ -139,7 +139,7 @@ ul {
 }
 .voting-dropdown-button {
   padding: 0 var(--spacer-4);
-  justify-content: start;
+  justify-content: flex-start;
   height: 36px;
   span {
     display: block;
