@@ -123,5 +123,5 @@ export enum pipeTypeData {
   Number = 'Number',
   BalanceOf = 'BalanceOf',
   Json = 'Json',
-  Percent = 'Percent'
+  Percent = 'Percent',
 }

@@ -1,0 +1,53 @@
+{
+  "fabric": "",
+  "cosmos": "http://10.89.246.108:3001/api/v1",
+  "chainId": "nois-testnet-005",
+  "timeStaking": "86400",
+  "env": "dev",
+  "urlSocket": "https://explorer-api.dev.aura.network",
+  "validator_s3": "https://validator-logos.s3.ap-southeast-1.amazonaws.com",
+  "coins": [],
+  "chain_info": {
+    "chainId": "nois-testnet-005",
+    "chainName": "Nois Testnet",
+    "rpc": "https://nois-testnet-rpc.polkachu.com/",
+    "rest": "",
+    "bip44": { "coinType": 118 },
+    "bech32Config": {
+      "bech32PrefixAccAddr": "nois",
+      "bech32PrefixAccPub": "noispub",
+      "bech32PrefixValAddr": "noisvaloper",
+      "bech32PrefixValPub": "noisvaloperpub",
+      "bech32PrefixConsAddr": "noisvalcons",
+      "bech32PrefixConsPub": "noisvalconspub"
+    },
+    "currencies": [{ "coinDenom": "unois", "coinMinimalDenom": "unois", "coinDecimals": 6 }],
+    "feeCurrencies": [{ "coinDenom": "unois", "coinMinimalDenom": "unois", "coinDecimals": 6 }],
+    "stakeCurrency": { "coinDenom": "unois", "coinMinimalDenom": "unois", "coinDecimals": 6 },
+    "coinType": 118,
+    "gasPriceStep": { "low": 0.001, "average": 0.0025, "high": 0.004 },
+    "features": ["ibc-transfer"],
+    "walletUrlForStaking": "https://testnet.nois.explorers.guru/validators",
+    "logo": "",
+    "explorer": "https://testnet.nois.explorers.guru/",
+    "beta": "false"
+  },
+  "image_s3": "https://aura-explorer-assets.s3.ap-southeast-1.amazonaws.com/dev-assets/",
+  "urlIndexer": "https://indexer.dev.aurascan.io/api/v1",
+  "timeInterval": 4000,
+  "ipfsDomain": "https://ipfs.io/",
+  "evnLabel": {
+    "desktop": "Develop Testnet Network",
+    "mobile": "Develop Testnet"
+  },
+  "horoscopeSelectedChain": "nois",
+  "horoscopeUrl": "https://indexer-v2.dev.aurascan.io/",
+  "horoscopePathGraphql": "api/v2/graphql",
+  "horoscopePathApi": "api/v2",
+  "notice": {
+    "content": "Aurascan will be temporarily unavailable due to Xstaxy network upgrades on Jun 12th, 14:00 UTC",
+    "url": "https://aurascan.io/votings/4"
+  },
+  "googleClientId": "3465782004-hp7u6vlitgs109rl0emrsf1oc7bjvu08.apps.googleusercontent.com",
+  "quotaSetPrivateName": 10
+}

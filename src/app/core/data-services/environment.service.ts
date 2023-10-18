@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ChainInfo } from '@keplr-wallet/types';
 import { BehaviorSubject } from 'rxjs';
+import { TRANSACTION_TYPE_ENUM, TypeTransaction } from '../constants/transaction.enum';
+import { TYPE_TRANSACTION } from '../constants/transaction.constant';
 
 export interface IConfiguration {
   fabric: string;
@@ -52,16 +54,18 @@ export class EnvironmentService {
     horoscopePathApi: '',
     notice: { content: '', url: '' },
     googleClientId: '',
-    quotaSetPrivateName: null
+    quotaSetPrivateName: null,
   });
 
   get configValue(): IConfiguration {
     return this.config.value;
   }
 
+  txTypes;
+
   constructor(private http: HttpClient) {}
 
-  async load(): Promise<void> {
+  loadConfig() {
     return this.http
       .get('./assets/config/config.json')
       .toPromise()
@@ -90,14 +94,33 @@ export class EnvironmentService {
           horoscopePathGraphql: config['horoscopePathGraphql'],
           horoscopePathApi: config['horoscopePathApi'],
           notice: config['notice'] || { content: '', url: '' },
-          googleClientId: config['googleClientId'] || '3465782004-hp7u6vlitgs109rl0emrsf1oc7bjvu08.apps.googleusercontent.com',
-          quotaSetPrivateName: config['quotaSetPrivateName'] || 10
+          googleClientId:
+            config['googleClientId'] || '3465782004-hp7u6vlitgs109rl0emrsf1oc7bjvu08.apps.googleusercontent.com',
+          quotaSetPrivateName: config['quotaSetPrivateName'] || 10,
         };
 
         this.config.next(data);
       })
       .catch((err: any) => {
         console.error(err);
+      });
+  }
+
+  async load(): Promise<void> {
+    await this.extendsTxType();
+    await this.loadConfig();
+  }
+
+  extendsTxType(): Promise<void> {
+    return this.http
+      .get('./assets/config/tx_type_config.json')
+      .toPromise()
+      .then((typeConfigs) => {
+        (typeConfigs as any[]).forEach((data) => {
+          TRANSACTION_TYPE_ENUM[data.label] = data.label;
+          TypeTransaction[data.value] = data.value;
+          TYPE_TRANSACTION.push({ label: TRANSACTION_TYPE_ENUM[data.label], value: TypeTransaction[data.value] });
+        });
       });
   }
 }
