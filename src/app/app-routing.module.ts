@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { EnableRouter } from './core/guards/route.guard';
 import { LayoutComponent } from './layouts/layout.component';
 
 const routes: Routes = [
@@ -18,6 +19,7 @@ const routes: Routes = [
       {
         path: 'validators',
         loadChildren: () => import('./pages/validators/validators.module').then((m) => m.ValidatorsModule),
+        canLoad: [EnableRouter],
       },
       {
         path: 'blocks',
@@ -53,6 +55,7 @@ const routes: Routes = [
       },
       {
         path: 'accountbound',
+        canLoad: [EnableRouter],
         loadChildren: () =>
           import('./pages/soulbound-token/soulbound-token.module').then((m) => m.SoulboundTokenModule),
       },
@@ -80,5 +83,6 @@ const routes: Routes = [
 @NgModule({
   imports: [RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' })],
   exports: [RouterModule],
+  providers: [EnableRouter],
 })
 export class AppRoutingModule {}

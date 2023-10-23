@@ -111,7 +111,7 @@ export const MENU: MenuItem[] = [
         id: 2,
         label: 'MENUITEMS.CODE-LIST',
         icon: 'code-simple',
-        link: '/code-ids/list',
+        link: '/code-ids',
         name: MenuName.CodeList,
       },
     ],
@@ -147,13 +147,13 @@ export const MENU: MenuItem[] = [
     subItems: [
       {
         id: 1,
-        label: 'Fee Grant',
+        label: 'MENUITEMS.FEE-GRANT',
         link: '/fee-grant',
         icon: 'gas-pump',
       },
       {
         id: 2,
-        label: 'ABT Creator',
+        label: 'MENUITEMS.ABT_CREATOR',
         link: '/accountbound',
         icon: 'medal',
       },

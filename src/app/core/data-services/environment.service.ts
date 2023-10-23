@@ -11,12 +11,9 @@ export interface IConfiguration {
   chainId: string;
   timeStaking: string;
   urlSocket: string;
-  validator_s3: string;
   image_s3: string;
   chain_info: ChainInfo | null;
   coins: any;
-  env: string;
-  indexerUri: string;
   timeInterval: number;
   ipfsDomain: string;
   evnLabel: any;
@@ -28,6 +25,7 @@ export interface IConfiguration {
   notice: { content: string; url: string };
   googleClientId: string;
   quotaSetPrivateName: number;
+  features: string[];
 }
 
 @Injectable()
@@ -38,12 +36,9 @@ export class EnvironmentService {
     chainId: '',
     timeStaking: '',
     urlSocket: '',
-    validator_s3: '',
     image_s3: '',
     chain_info: null,
     coins: '',
-    env: '',
-    indexerUri: '',
     timeInterval: null,
     ipfsDomain: '',
     evnLabel: '',
@@ -55,13 +50,12 @@ export class EnvironmentService {
     notice: { content: '', url: '' },
     googleClientId: '',
     quotaSetPrivateName: null,
+    features: [],
   });
 
   get configValue(): IConfiguration {
     return this.config.value;
   }
-
-  txTypes;
 
   constructor(private http: HttpClient) {}
 
@@ -70,22 +64,19 @@ export class EnvironmentService {
       .get('./assets/config/config.json')
       .toPromise()
       .then((config: any) => {
-        const chainId = config['chainId'] || 'serenity-testnet-001';
         const chain_info = config['chain_info'];
+        const chainId = chain_info.chainId;
 
         const data: IConfiguration = {
           fabric: config['fabric'],
-          beUri: config['cosmos'],
+          beUri: config['beUri'],
           chainId,
           timeStaking: config['timeStaking'] || '1814400',
           urlSocket: config['urlSocket'],
-          validator_s3: config['validator_s3'],
-          image_s3: config['image_s3'] || 'https://aura-explorer-assets.s3.ap-southeast-1.amazonaws.com/dev-assets/',
+          image_s3: config['image_s3'] || './assets/',
           chain_info,
           coins: config['coins'],
-          env: config['env'],
-          indexerUri: config['urlIndexer'],
-          timeInterval: config['timeInterval'] || 4000,
+          timeInterval: config['blockTime'] || 4000,
           ipfsDomain: config['ipfsDomain'],
           evnLabel: config['evnLabel'],
           maxValidator: config['maxValidator'] || 200,
@@ -97,6 +88,7 @@ export class EnvironmentService {
           googleClientId:
             config['googleClientId'] || '3465782004-hp7u6vlitgs109rl0emrsf1oc7bjvu08.apps.googleusercontent.com',
           quotaSetPrivateName: config['quotaSetPrivateName'] || 10,
+          features: config['features'],
         };
 
         this.config.next(data);

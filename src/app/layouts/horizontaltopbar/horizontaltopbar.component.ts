@@ -80,6 +80,20 @@ export class HorizontaltopbarComponent implements OnInit, AfterViewInit {
       }
     });
 
+    this.menuItems.forEach((menu) => {
+      if (menu.subItems) {
+        menu.subItems.forEach((item) => {
+          const linkSplit = item.link.split('/');
+
+          const link = linkSplit.pop();
+
+          if (!this.environmentService.configValue.features.includes(link)) {
+            item.disabled = true;
+          }
+        });
+      }
+    });
+
     this.walletService.wallet$.subscribe((wallet) => {
       if (wallet) {
         this.menuItems.forEach((item) => {
