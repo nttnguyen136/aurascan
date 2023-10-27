@@ -294,7 +294,7 @@ export class AccountTransactionTableComponent {
         this.templates = [...this.templatesToken];
         this.templates.push({ matColumnDef: 'amount', headerCellDef: 'Amount', headerWidth: 17 });
         this.displayedColumns = this.templates.map((dta) => dta.matColumnDef);
-        this.getListTxAuraByAddress(payload);
+        this.queryListTxId(payload);
         break;
       case TabsAccountLink.FtsTxs:
         payload['sender'] = payload['receiver'] = address;
@@ -347,6 +347,15 @@ export class AccountTransactionTableComponent {
     this.lstType.emit(this.tnxTypeOrigin);
   }
 
+  queryListTxId(payload) {
+    console.log(payload);
+    this.userService.queryListTxId(payload).subscribe((res) => {
+      console.log(res);
+      
+      this.getListTxAuraByAddress(res.fetch_tx_ids_by_events);
+    });
+  }
+
   getListTxByAddress(payload) {
     this.userService.getListTxByAddress(payload).subscribe({
       next: (data) => {
@@ -361,9 +370,11 @@ export class AccountTransactionTableComponent {
     });
   }
 
-  getListTxAuraByAddress(payload) {
-    this.userService.getListTxAuraByAddress(payload).subscribe({
+  getListTxAuraByAddress(ids) {
+    this.userService.getListTxAuraByAddress(ids).subscribe({
       next: (data) => {
+        console.log(data);
+        
         this.handleGetData(data);
       },
       error: () => {

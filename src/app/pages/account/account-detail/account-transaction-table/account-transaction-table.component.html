@@ -155,7 +155,7 @@
           </ul>
         </div>
 
-        <div *ngIf="modeQuery !== tabsData.FtsTxs && modeQuery !== tabsData.NftTxs" class="ml-6">
+        <div *ngIf="modeQuery === tabsData.ExecutedTxs" class="ml-6">
           <button
             #tnxTypeMenuBtn
             (menuClosed)="initTnxFilterPanel()"
