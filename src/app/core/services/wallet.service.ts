@@ -27,6 +27,7 @@ import { getKeplr, handleErrors } from '../utils/keplr';
 import local from '../utils/storage/local';
 import { NgxToastrService } from './ngx-toastr.service';
 import { STORAGE_KEYS } from '../constants/common.constant';
+import { isCoin98Browser, isKeplrBrowser, isLeapBrowser } from '../helpers/wallet';
 
 export type WalletKey = Partial<Key> | AccountResponse;
 
@@ -288,7 +289,18 @@ export class WalletService implements OnDestroy {
     const lastProvider = getLastProvider();
     const signingType = getSigningType(lastProvider);
 
-    if (this.isMobileMatched && !this.checkExistedCoin98() && lastProvider != WALLET_PROVIDER.LEAP) {
+    console.log('isKeplrBrowser: ' + isKeplrBrowser());
+    console.log('isLeapBrowser: ' + isLeapBrowser()());
+    console.log('isCoin98Browser: ' + isCoin98Browser()());
+
+    console.log(
+      (window as any)?.coin98,
+      (window as any)?.leap,
+      (window as any)?.keplr
+    );
+
+    const _isCoin98Browser = isCoin98Browser();
+    if (_isCoin98Browser) {
       const msgs = messageCreators[messageType](senderAddress, message, network);
       let fee;
       if (this.coin98Client) {
