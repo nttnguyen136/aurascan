@@ -290,8 +290,8 @@ export class WalletService implements OnDestroy {
     const signingType = getSigningType(lastProvider);
 
     console.log('isKeplrBrowser: ' + isKeplrBrowser());
-    console.log('isLeapBrowser: ' + isLeapBrowser()());
-    console.log('isCoin98Browser: ' + isCoin98Browser()());
+    console.log('isLeapBrowser: ' + isLeapBrowser());
+    console.log('isCoin98Browser: ' + isCoin98Browser());
 
     console.log(
       (window as any)?.coin98,
